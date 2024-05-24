@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="../js/echarts.js"></script>
+</head>
+
+<body>
+    <!-- 为ECharts准备一个定制了大小的DOM -->
+    <div id="main" style="width: 700px; height: 400px;"></div>
+    <script type="text/javascript">
+        // 基于准备好的DOM，初始化ECharts表
+        var myChart = echarts.init(document.getElementById('main'));
+        // 指定图表的配置项和数据
+        option = {
+            color: ['DarkGreen', 'red', 'LimeGreen', 'blue', 'Purple', 'GreenYellow', 'DarkTurquoise'],
+            backgroundColor: 'rgba(128,128,128,0.1)',
+            title: {
+                text: '影响健康、寿命的各类因素',
+                subtext: 'WHO统计调查报告',
+                left: 144, top: 5
+            },
+            tooltip: {
+                trigger: 'item',
+                formatter: function (data) {
+                    return data.seriesName + '<br/>' + data.name + ':' + data.value + '(' + data.percent.toFixed(1) + '%)';
+                }
+            },
+            legend: {
+                orient: 'vertical',
+                top: 22,
+                left: 22,
+                data: ['生活方式', '遗传因素', '社会因素', '医疗条件', '气候环境']
+            },
+            toolbox: {
+                show: true,
+                left: 444,
+                top: 28,
+                feature: {
+                    mark: { show: true },
+                    dataView: { show: true, readOnly: false },
+                    magicType: {
+                        show: true,
+                        type: ['pie', 'funnel'],
+                        option: {
+                            funnel: {
+                                x: '25%', width: '50%',
+                                funnelAlign: 'left', max: 1548
+                            }
+                        }
+                    },
+                    restore: { show: true },
+                    saveAsImage: { show: true }
+                }
+            },
+            calculable: true,
+            series: [
+                {
+                    cursor: true,
+                    name: '访问来源',
+                    type: 'pie',
+                    itemStyle: {
+                        normal: {
+                            borderColor: '#fff', borderWidth: 1,
+                            label: { show: true, position: 'outer' },
+                            labelLine: {
+                                show: true, length: 4,
+                                lineStyle: {
+                                    width: 1,
+                                    type: 'solid'
+                                }
+                            }
+                        }
+                    }, legendHoverLink: false,
+                    radius: ['45%', '75%'],
+                    center: ['58%', '55%'],
+                    data: [
+                        { value: 60, name: '生活方式' },
+                        { value: 15, name: '遗传因素' },
+                        { value: 10, name: '社会因素' },
+                        { value: 8, name: '医疗条件' },
+                        { value: 7, name: '气候环境' }
+                    ]
+                }
+            ]
+        };
+        myChart.setOption(option);
+        var _this = this
+        var _isSet = true
+        var currentIndex = -1
+        var chartHover = function () {
+            var dataLen = option.series[0].data.length
+            _this.myChart.dispatchAction({
+                type: 'downplay',
+                seriesIndex: 0,
+                dataIndex: currentIndex
+            })
+            currentIndex = (currentIndex + 1) % dataLen
+            _this.myChart.dispatchAction({
+                type: 'highlight',
+                seriesIndex: 0,
+                dataIndex: currentIndex
+
+            })
+            _this.myChart.dispatchAction({
+                type: 'showTip',
+                seriesIndex: 0,
+                dataIndex: currentIndex
+
+            })
+        }
+        _this.startCharts = setInterval(chartHover, 3000)
+        this.myChart.on('mouseover', function (param) {
+            isSet = false,
+                clearInterval(_this.startCharts),
+                _this.myChart.dispatchAction({
+                    type: 'downplay',
+                    seriesIndex: 0,
+                    dataIndex: currentIndex
+                })
+            currentIndex = (currentIndex + 1) % dataLen
+            _this.myChart.dispatchAction({
+                type: 'highlight',
+                seriesIndex: 0,
+                dataIndex: currentIndex
+
+            })
+            _this.myChart.dispatchAction({
+                type: 'showTip',
+                seriesIndex: 0,
+                dataIndex: currentIndex
+
+            })
+        })
+        this.myChart.on('mouseout', function (param) {
+            if (!isSet) {
+                _this.startCharts = setInterval(chartHover, 3000),
+                    isSet = true
+            }
+        })
+    </script>
+
+</body>
+
+</html>
